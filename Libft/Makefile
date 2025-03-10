@@ -1,4 +1,4 @@
-#******************************************************************************#
+# **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
@@ -6,14 +6,46 @@
 #    By: bfleury <bfleury@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/04 23:06:16 by bfleury           #+#    #+#              #
-#    Updated: 2025/02/15 13:16:55 by bfleury          ###   ########.fr        #
+#    Updated: 2025/03/10 14:36:32 by bfleury          ###   ########.fr        #
 #                                                                              #
-#******************************************************************************#
+# **************************************************************************** #
 
 NAME				= libft.a
 
+TYPEFILE			= library
+
+SRCS_DIR			= .
+OBJS_DIR			= objs
+INCLUDES			= .
+
 CC					= cc
 CFLAGS				= -Wall -Wextra -Werror
+
+RM					= rm -rf
+
+################################## MESSAGES ####################################
+
+BOLD				= \033[1m
+RED					= \033[31m
+YELLOW				= \033[33m
+GREEN				= \033[32m
+END					= \033[0m
+
+ERASE				= "\r                                                                                \r"
+
+SUCCESS_MSG			= "$(BOLD)$(GREEN)[SUCCESS]$(END)"
+
+OBJS_DIR_MSG		= "$(YELLOW)Creating $(TYPEFILE) $(OBJS_DIR) directory...$(END)"
+OBJS_MSG			= "$(YELLOW)Generating $< object...$(END)"
+
+PROJECT_MSG			= "$(GREEN)Generating $(NAME) $(TYPEFILE)...		$(END)"
+BONUS_MSG			= "$(GREEN)Generating $(NAME) bonus $(TYPEFILE)...	$(END)"
+
+RM_OBJS_MSG			= "$(RED)Removing $(TYPEFILE) objects...		$(END)"
+RM_OBJS_DIR_MSG		= "$(RED)Removing $(TYPEFILE) objs directory...	$(END)"
+RM_PROJECT_MSG		= "$(RED)Removing $(TYPEFILE)...			$(END)"
+
+#################################### FILES #####################################
 
 FILES				= ft_atoi.c				\
 					ft_bzero.c				\
@@ -60,35 +92,53 @@ B_FILES				= ft_lstadd_back.c		\
 					ft_lstnew.c				\
 					ft_lstsize.c
 
-OBJS_DIR			= objs
+#################################### OBJS ######################################
+
 OBJS				= $(FILES:%.c=$(OBJS_DIR)/%.o)
 B_OBJS				= $(B_FILES:%.c=$(OBJS_DIR)/%.o)
 
+#################################### RULES #####################################
+
 all:				$(NAME)
 
-$(NAME):			$(OBJS_DIR) $(OBJS)
-					@ar rc $(NAME) $(OBJS)
-					@ranlib $(NAME)
 
-bonus:				$(OBJS_DIR) $(OBJS) $(B_OBJS)
-					@ar rc $(NAME) $(OBJS) $(B_OBJS)
+$(NAME):			$(OBJS_DIR) $(OBJS)
+					@printf $(ERASE)
+					@printf $(PROJECT_MSG)
+					@ar rcs $(NAME) $(OBJS)
 					@ranlib $(NAME)
+					@echo $(SUCCESS_MSG)
+
+bonus:				$(NAME) $(B_OBJS)
+					@printf $(ERASE)
+					@printf $(BONUS_MSG)
+					@ar rcs $(NAME) $(NAME) $(B_OBJS)
+					@ranlib $(NAME)
+					@echo $(SUCCESS_MSG)
 
 $(OBJS_DIR):
+					@printf $(OBJS_DIR_MSG)
 					@mkdir -p objs
 
 $(OBJS_DIR)/%.o:	%.c
-					@$(CC) $(CFLAGS) -c $< -o $@
+					@printf $(ERASE)
+					@printf $(OBJS_MSG)
+					@$(CC) $(CFLAGS) -I$(INCLUDES) -c $< -o $@
 
-$(OBJS_DIR)/%.o:	%.c
-					@$(CC) $(CFLAGS) -c $< -o $@
+#################################### CLEAN #####################################
 
 clean:
-					@rm -rf $(OBJS_DIR)
+					@printf $(RM_OBJS_DIR_MSG)
+					@$(RM) $(OBJS_DIR)
+					@echo $(SUCCESS_MSG)
 
-fclean: 			clean
-					@rm -f $(NAME)
+xclean:
+					@printf $(RM_PROJECT_MSG)
+					@$(RM) $(NAME)
+					@echo $(SUCCESS_MSG)
+
+fclean:				clean xclean
 
 re:					fclean all
 
-.PHONY:				clean fclean re
+.PHONY:				all bonus clean xclean fclean re
